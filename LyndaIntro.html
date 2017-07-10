@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>creating a react component</title>	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0-alpha1/react.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0-alpha1/JSXTransformer.js"></script>
+
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	<div id="react-container">
+		
+	</div>
+	<script type="text/babel">
+		var MyComponent = React.createClass({
+		render: function(){
+		return <div>
+			<h1>{this.props.text}</h1>
+			<p>{this.props.children}</p>
+
+		</div>
+		}
+		})
+		React.render(<div>
+		<MyComponent text="hello">this is helloo</MyComponent>
+		<MyComponent text="hellllooo">this is hellllloooooo</MyComponent>
+		<MyComponent text="goodbye">this is goodbye</MyComponent>
+		</div>,document.getElementById("react-container"));
+ 
+	</script>
+</body>
+</html>

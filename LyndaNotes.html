@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>handling events</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0-alpha1/react.min.js"></script>
+	<!-- <script src="react-dom.min.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0-alpha1/JSXTransformer.js"></script>
+	<style type="text/css" media="screen">
+		body{
+			background-color: #DE8C8C;
+		}
+		div.note{
+			padding-top: 10px;
+			padding-left: 10px;
+			background-color: #F2E488;
+			height:200px;
+			width: 200px;
+			position: absolute;
+			box-shadow: 10px 10px 50px;
+		}
+		.note>span{
+			position: absolute;
+    		bottom: 0;
+    		right: 0;
+		}
+		.note>textarea{
+			
+			background-color: #ECDD79;
+			height:120px;
+			width: 180px;
+		}
+		
+		
+	</style>
+</head>
+<body>
+	<div id="react-container">
+		
+	</div>
+	<script type="text/jsx">
+
+
+		var EventHandle = React.createClass({
+		getInitialState: function(){
+			return {editing:false}
+		},
+		componentWillMount:function(){
+			this.style = {
+				right:this.randomBetween(0,window.innerWidth-150)+'px',
+				top:this.randomBetween(0,window.innerHeight-150)+'px',
+				transform: 'rotate('+this.randomBetween(-10,10)+'deg)'
+			};
+		},
+		randomBetween:function(min,max){
+		return(min+ Math.ceil(Math.random()*max));
+		},
+		edit:function(){
+			this.setState({editing: true});
+
+		},
+		save: function(){
+			this.props.onChange(this.refs.newText.getDOMNode().value,this.props.index);
+			this.setState({editing: false});
+		},
+		remove:function(){
+			this.props.onRemove(this.props.index);
+		},
+		renderDisplay: function(){
+		return(
+		<div className="note" style={this.style}>
+		<p>{this.props.children}</p>
+		<span>
+			<button type="button" onClick={this.edit} className="btn btn-primary glyphicon glyphicon-pencil"></button>
+
+			<button type="button" onClick={this.remove} className="btn btn-danger glyphicon glyphicon-trash"></button>
+		</span>
+		</div>)
+
+		},
+		renderForm: function(){
+			return(
+				<div className="note"
+				style={this.style}>
+				<textarea defaultValue={this.props.children} ref="newText" className="form-control"></textarea>
+				<button className="btn btn-sucess btn-sm glyphicon glyphicon-floppy-disk" onClick={this.save}/>
+				</div>
+			)
+		},
+		render:function(){
+			if(this.state.editing){
+				return this.renderForm();
+			}else{
+				return this.renderDisplay();
+			}
+		}
+		});
+
+		var Board = React.createClass({
+		propTypes:{
+			count: function(props,propName){
+				if(typeof props[propName] !== "number"){
+				return new Error('the count property must be a number');
+				}
+				if(props[propName]>100){
+				return new Error('Creating '+props[propName]+" notes is ridiculas ");
+				}
+			}
+		},
+		getInitialState: function(){
+			return{
+				notes: [ ]
+			};
+		},
+		nextId:function(){
+		this.uniqueId=this.uniqueId || 0;
+		return this.uniqueId++;
+		},
+		add: function(text){
+		var arr = this.state.notes;
+		arr.push({
+		id:this.nextId(),
+		note:text
+		});
+		this.setState({notes:arr});
+		},
+		update: function(newText,i){
+		var arr=this.state.notes;
+		arr[i].note = newText;
+		this.setState({notes:arr});
+		},
+		remove: function(i){
+		var arr = this.state.notes;
+		arr.splice(i,1);
+		this.setState({notes:arr});
+		},
+		eachNote:function(note,i){
+		return(
+			<EventHandle key={note.id}
+				index={i}
+				onChange={this.update}
+				onRemove={this.remove}
+			>{note.note}</EventHandle>
+		)
+		},
+		render: function(){
+		return (
+				<div className="board">
+					{this.state.notes.map(this.eachNote)}
+				<button className="btn btn-sm glyphicon glyphicon-plus" 
+						onClick={this.add} />	
+				</div>
+				)}
+		})
+
+
+
+		React.render(<Board count={10}/>,document.getElementById('react-container'));
+
+	</script>
+</body>
+</html>
